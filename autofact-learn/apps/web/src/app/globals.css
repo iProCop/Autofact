@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0a0e14;
+  --bg-2: #10161f;
+  --elev: #161d28;
+  --card: #1a2330;
+  --card-2: #222c3a;
+  --line: #2c3748;
+  --text: #f2f5f8;
+  --muted: #8b97a8;
+  --lime: #b4e64b;
+  --lime-dim: rgba(180, 230, 75, 0.14);
+  --lime-glow: rgba(180, 230, 75, 0.35);
+  --warn: #f0a020;
+  --danger: #ff5c5c;
+  --star: #ff4d4f;
+  --ink: #0b1208;
+  --radius: 18px;
+  --nav-h: 72px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+body {
+  background-image:
+    radial-gradient(900px 520px at 50% -20%, rgba(45, 120, 90, 0.18), transparent 55%),
+    radial-gradient(700px 400px at 100% 10%, rgba(180, 230, 75, 0.06), transparent 50%),
+    linear-gradient(180deg, #070b11 0%, var(--bg) 40%, #0c121a 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(480px, 100%);
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: calc(var(--nav-h) + 12px);
+}
+
+.app-shell.no-nav {
+  padding-bottom: 0;
+}
+
+.page {
+  padding: 16px 16px 8px;
+}
+
+.display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.lime {
+  color: var(--lime);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.card {
+  background: linear-gradient(180deg, var(--card) 0%, #171f2b 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 14px 18px;
+  font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-lime {
+  background: var(--lime);
+  color: var(--ink);
+  box-shadow: 0 0 0 0 var(--lime-glow);
+}
+
+.btn-lime:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 0 24px var(--lime-glow);
+}
+
+.btn-dark {
+  background: #121820;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.field-wrap {
+  position: relative;
+}
+
+.field {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid #3a4658;
+  background: rgba(16, 22, 32, 0.9);
+  color: var(--text);
+  padding: 14px 44px 14px 14px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field:focus {
+  border-color: var(--lime);
+  box-shadow: 0 0 0 3px var(--lime-dim);
+}
+
+.field-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6f7d90;
+  pointer-events: none;
+}
+
+.price-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lime);
+  color: var(--ink);
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  box-shadow: 0 0 16px var(--lime-glow);
+}
+
+.grade {
+  display: inline-flex;
+  min-width: 34px;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.grade-a {
+  background: rgba(180, 230, 75, 0.2);
+  color: var(--lime);
+}
+
+.grade-b {
+  background: rgba(240, 160, 32, 0.2);
+  color: var(--warn);
+}
+
+.grade-c {
+  background: rgba(255, 92, 92, 0.18);
+  color: var(--danger);
+}
+
+.underline-lime {
+  display: inline-block;
+  border-bottom: 2px solid var(--lime);
+  padding-bottom: 2px;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #18202b 25%, #243041 50%, #18202b 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite linear;
+  border-radius: 12px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes spin-soft {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+.logo-float {
+  animation: floaty 3.2s ease-in-out infinite;
+}
+
+.spin-ring {
+  animation: spin-soft 1.2s linear infinite;
+}
+
+.progress-track {
+  height: 4px;
+  width: 120px;
+  border-radius: 999px;
+  background: #1c2430;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--lime);
+  border-radius: inherit;
+  box-shadow: 0 0 10px var(--lime-glow);
+  transition: width 0.35s ease;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: min(440px, calc(100% - 24px));
+  height: 58px;
+  border-radius: 999px;
+  background: rgba(18, 24, 32, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  padding: 6px;
+  z-index: 50;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  border-radius: 999px;
+  color: #c5ced9;
+  transition: 0.2s ease;
+}
+
+.nav-item.active {
+  background: var(--lime);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 0 18px var(--lime-glow);
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  min-height: 168px;
+  background:
+    linear-gradient(120deg, rgba(8, 12, 18, 0.75), rgba(8, 12, 18, 0.25)),
+    url("https://images.unsplash.com/photo-1555215695-3004980ad094?auto=format&fit=crop&w=1200&q=80")
+      center/cover;
+  border: 1px solid var(--line);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  background: rgba(20, 26, 34, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e8eef6;
+  backdrop-filter: blur(6px);
+}
+
+@media (min-width: 900px) {
+  .app-shell {
+    width: min(1100px, 100%);
+  }
+
+  .desktop-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 20px;
+    align-items: start;
+  }
+}

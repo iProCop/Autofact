@@ -1,0 +1,100 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Native Node binaries (often >100 MB; e.g. @next/swc-win32-x64-msvc)
+*.node
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Builds / caches
+dist/
+build/
+out/
+.next/
+.turbo/
+.cache/
+*.tsbuildinfo
+coverage/
+.nyc_output/
+
+# Nest / Prisma
+apps/**/uploads/
+**/generated/prisma/
+
+# Logs / debug
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+
+# Docker / local overrides
+docker-compose.override.yml
+
+# Misc
+*.pem
+.vercel
+*.local
+
+# Large binaries (GitHub rejects files > 100 MB; .gitignore cannot filter by size,
+# so we ignore common heavy types / dumps that usually exceed the limit)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+*.iso
+*.dmg
+*.exe
+*.msi
+*.apk
+*.ipa
+*.psd
+*.ai
+*.sketch
+*.fig
+*.blend
+*.fbx
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+*.bak
+*.raw
+*.cr2
+*.nef
+docker-images/
+*.tar.docker
+**/uploads/**
+!**/uploads/.gitkeep
