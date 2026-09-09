@@ -3,11 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { MediaType, ReportStatus, Role, Prisma } from '@prisma/client';
+import { ReportStatus, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { PricingService } from '../pricing/pricing.service';
 import { PlatformScoreService } from '../platform-score/platform-score.service';
-import { CreateReportDto, ListReportsQueryDto } from './dto/reports.dto';
+import { CreateReportDto, ListReportsQueryDto } from './reports.dto';
 import { AuthUser } from '../common/decorators/current-user.decorator';
 
 @Injectable()
@@ -22,7 +22,9 @@ export class ReportsService {
     const expert = await this.prisma.expertProfile.findUnique({
       where: { userId },
     });
-    if (!expert) throw new ForbiddenException('Профиль эксперта не найден');
+    if (!expert) {
+      throw new ForbiddenException('Профиль эксперта не найден');
+    }
     return expert;
   }
 
@@ -30,6 +32,7 @@ export class ReportsService {
     if (user.role !== Role.EXPERT && user.role !== Role.ADMIN) {
       throw new ForbiddenException('Только эксперт может создавать отчёты');
     }
+
     const expert = await this.getExpertProfileId(user.userId);
     const overall =
       (dto.engineScore +
@@ -58,7 +61,6 @@ export class ReportsService {
         tiresScore: dto.tiresScore ?? 7,
         electricsScore: dto.electricsScore ?? 7,
         expertOverallScore: overall,
-        defects: (dto.defects ?? []) as unknown as Prisma.InputJsonValue,
         basePriceKopecks: dto.basePriceKopecks,
         region: dto.region,
         city: dto.city,
@@ -72,7 +74,10 @@ export class ReportsService {
       where: { id: reportId },
       include: { expert: true },
     });
-    if (!report) throw new NotFoundException('Отчёт не найден');
+
+    if (!report) {
+      throw new NotFoundException('Отчёт не найден');
+    }
     if (report.expert.userId !== user.userId && user.role !== Role.ADMIN) {
       throw new ForbiddenException('Нельзя публиковать чужой отчёт');
     }
@@ -162,7 +167,6 @@ export class ReportsService {
               city: true,
             },
           },
-          media: { orderBy: { sortOrder: 'asc' }, take: 1 },
         },
       }),
       this.prisma.carReport.count({ where }),
@@ -197,7 +201,7 @@ export class ReportsService {
             ...item.expert,
             rating: Number(item.expert.rating),
           },
-          coverUrl: item.media[0]?.url ?? null,
+          coverUrl: null as string | null,
           createdAt: item.createdAt,
         };
       })
@@ -221,45 +225,27 @@ export class ReportsService {
             specializations: true,
           },
         },
-        media: { orderBy: { sortOrder: 'asc' } },
       },
     });
-    if (!report) throw new NotFoundException('Отчёт не найден');
+    if (!report) {
+      throw new NotFoundException('Отчёт не найден');
+    }
 
     const price = this.pricing.getPriceKopecks(
       report.basePriceKopecks,
       report.createdAt,
     );
 
-    let purchased = false;
     let isOwner = false;
-
-    if (user) {
-      if (user.role === Role.EXPERT || user.role === Role.ADMIN) {
-        const expert = await this.prisma.expertProfile.findUnique({
-          where: { userId: user.userId },
-        });
-        isOwner = !!expert && expert.id === report.expertId;
-      }
-      if (user.role === Role.CLIENT || user.role === Role.ADMIN) {
-        const client = await this.prisma.clientProfile.findUnique({
-          where: { userId: user.userId },
-        });
-        if (client) {
-          const purchase = await this.prisma.purchase.findUnique({
-            where: {
-              clientId_reportId: { clientId: client.id, reportId },
-            },
-          });
-          purchased = !!purchase;
-        }
-      }
+    if (user && (user.role === Role.EXPERT || user.role === Role.ADMIN)) {
+      const expert = await this.prisma.expertProfile.findUnique({
+        where: { userId: user.userId },
+      });
+      isOwner = !!expert && expert.id === report.expertId;
     }
 
-    const canViewFull =
-      purchased || isOwner || user?.role === Role.ADMIN;
+    const canViewFull = isOwner || user?.role === Role.ADMIN;
 
-    const previewMedia = report.media.slice(0, 1);
     const scoresPreview = {
       bodyScore: report.bodyScore,
       paintScore: report.paintScore,
@@ -290,8 +276,7 @@ export class ReportsService {
         ...report.expert,
         rating: Number(report.expert.rating),
       },
-      media: canViewFull ? report.media : previewMedia,
-      purchased,
+      purchased: false,
       isOwner,
       locked: !canViewFull,
       scores: scoresPreview,
@@ -306,7 +291,6 @@ export class ReportsService {
             interiorScore: report.interiorScore,
             tiresScore: report.tiresScore,
             electricsScore: report.electricsScore,
-            defects: report.defects,
             mileage: report.mileage,
           }
         : null,
@@ -319,32 +303,6 @@ export class ReportsService {
     return this.prisma.carReport.findMany({
       where: { expertId: expert.id },
       orderBy: { createdAt: 'desc' },
-      include: { media: { take: 1, orderBy: { sortOrder: 'asc' } } },
-    });
-  }
-
-  async addMedia(
-    user: AuthUser,
-    reportId: string,
-    fileName: string,
-    type: MediaType = MediaType.PHOTO,
-  ) {
-    const report = await this.prisma.carReport.findUnique({
-      where: { id: reportId },
-      include: { expert: true, media: true },
-    });
-    if (!report) throw new NotFoundException('Отчёт не найден');
-    if (report.expert.userId !== user.userId && user.role !== Role.ADMIN) {
-      throw new ForbiddenException('Нельзя менять чужой отчёт');
-    }
-
-    return this.prisma.reportMedia.create({
-      data: {
-        reportId,
-        type,
-        url: `/uploads/${fileName}`,
-        sortOrder: report.media.length,
-      },
     });
   }
 }

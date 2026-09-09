@@ -18,7 +18,6 @@ export type PriceResult = {
   historical: boolean;
   mode: PricingMode;
   strategy: PricingStrategy;
-  /** false in MANUAL — time/demand/strategy do not change sell price */
   autoApplied: boolean;
 };
 
@@ -29,11 +28,9 @@ export type GetPriceInput = {
   demandMultiplier?: number;
   mode?: PricingMode;
   strategy?: PricingStrategy;
-  /** Sell price when mode=MANUAL (defaults to base). */
   manualPriceKopecks?: number;
 };
 
-/** Hybrid pricing: band + mode/strategy + time decay + optional demand. */
 @Injectable()
 export class PricingService {
   getBand(carClass: CarClass): PriceBand {
@@ -47,7 +44,7 @@ export class PricingService {
       basePriceKopecks > band.maxKopecks
     ) {
       throw new BadRequestException(
-        `Цена вне вилки для ${carClass}: ${band.minKopecks}…${band.maxKopecks} коп.`,
+        `Цена вне вилки для ${carClass}: от ${band.minKopecks} до ${band.maxKopecks} коп., рекомендуемая — ${band.recommendedKopecks}`,
       );
     }
   }
@@ -56,7 +53,6 @@ export class PricingService {
     return STRATEGY_MULTIPLIER[strategy];
   }
 
-  /** Mode switch allowed at most once per 24h. */
   canChangePricingMode(
     lastModeChangeAt: Date | null | undefined,
     now = new Date(),
@@ -64,26 +60,6 @@ export class PricingService {
     if (!lastModeChangeAt) return true;
     const dayMs = 24 * 60 * 60 * 1000;
     return now.getTime() - lastModeChangeAt.getTime() >= dayMs;
-  }
-
-  /**
-   * Backward-compatible entry: positional args still work (AUTO + BALANCE).
-   * Prefer getPrice() with options for mode/strategy/manual.
-   */
-  getPriceKopecks(
-    basePriceKopecks: number,
-    createdAt: Date,
-    now = new Date(),
-    demandMultiplier = 1,
-  ): PriceResult {
-    return this.getPrice({
-      basePriceKopecks,
-      createdAt,
-      now,
-      demandMultiplier,
-      mode: PricingMode.AUTO,
-      strategy: PricingStrategy.BALANCE,
-    });
   }
 
   getPrice(input: GetPriceInput): PriceResult {
@@ -97,7 +73,6 @@ export class PricingService {
     const timeMultiplier = this.timeMultiplierForAge(ageDays);
     const archived = ageDays >= 90;
     const historical = archived;
-
     const recommendedPriceKopecks = Math.round(
       input.basePriceKopecks * timeMultiplier * demand * stratMul,
     );
@@ -121,7 +96,6 @@ export class PricingService {
       };
     }
 
-    // AUTO
     return {
       priceKopecks: recommendedPriceKopecks,
       recommendedPriceKopecks,
@@ -136,6 +110,22 @@ export class PricingService {
       strategy,
       autoApplied: true,
     };
+  }
+
+  getPriceKopecks(
+    basePriceKopecks: number,
+    createdAt: Date,
+    now = new Date(),
+    demandMultiplier = 1,
+  ): PriceResult {
+    return this.getPrice({
+      basePriceKopecks,
+      createdAt,
+      now,
+      demandMultiplier,
+      mode: PricingMode.AUTO,
+      strategy: PricingStrategy.BALANCE,
+    });
   }
 
   timeMultiplierForAge(ageDays: number): number {

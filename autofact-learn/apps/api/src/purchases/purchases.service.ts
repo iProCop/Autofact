@@ -67,7 +67,8 @@ export class PurchasesService {
       report.basePriceKopecks,
       report.createdAt,
     );
-    if (price.archived || price.priceKopecks <= 0) {
+    // archived+historical (10%) ещё можно купить как справку; нулевая цена — нет
+    if (price.priceKopecks <= 0) {
       throw new BadRequestException('Отчёт в архиве');
     }
 

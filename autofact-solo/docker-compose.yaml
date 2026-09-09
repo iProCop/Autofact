@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: solo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: autofact
+      POSTGRES_PASSWORD: autofact
+      POSTGRES_DB: autofact_solo
+    ports:
+      - "5434:5432"
+    volumes:
+      - solo_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autofact -d autofact_solo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: solo-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - solo_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  adminer:
+    image: adminer:4
+    container_name: solo-adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  solo_pg_data:
+  solo_redis_data:

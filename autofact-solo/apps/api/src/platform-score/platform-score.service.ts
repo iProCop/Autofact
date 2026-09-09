@@ -16,12 +16,13 @@ export type PlatformScoreResult = {
 export class PlatformScoreService {
   calculate(scores: ExpertScoreInput[]): PlatformScoreResult {
     const unique = this.uniqueByExpert(scores);
+
     if (unique.length < 3) {
       return {
         platformScore: null,
         disputed: false,
-        sampleSize: unique.length
-       };
+        sampleSize: unique.length,
+      };
     }
 
     const values = unique.map((s) => s.overallScore);
@@ -38,10 +39,11 @@ export class PlatformScoreService {
     }
 
     const platformScore = Math.round((weighted / weightSum) * 100) / 100;
-    return { 
-      platformScore, 
-      disputed, 
-      sampleSize: unique.length 
+
+    return {
+      platformScore,
+      disputed,
+      sampleSize: unique.length,
     };
   }
 

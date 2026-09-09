@@ -28,5 +28,9 @@
 
 ## Старт
 
-→ [`01_LESSON_0_ENV.md`](./01_LESSON_0_ENV.md)  
-Дальше → [`02_LESSON_1_DOCKER.md`](./02_LESSON_1_DOCKER.md)
+1. Корень проекта: [`../../README.md`](../../README.md)  
+2. Все уроки: [`CURRICULUM.md`](./CURRICULUM.md)  
+3. → [`01_LESSON_0_ENV.md`](./01_LESSON_0_ENV.md)  
+4. Дальше → [`02_LESSON_1_DOCKER.md`](./02_LESSON_1_DOCKER.md)
+
+**Важно:** открой в Cursor папку `C:\AutoFact` (не NetoDip) — иначе агент путает проекты.
